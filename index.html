@@ -63,6 +63,7 @@
             );
                 
             // Ajout des collisions, utilisation de la propriété estSolide
+            // TODO : sur Tiled, ajouter une propriété faitMal sur les pointes
             platformLayer.setCollisionByProperty({estSolide: true}); 
             spikesLayer.setCollisionByProperty({estSolide: true}); 
 
@@ -90,6 +91,18 @@
                 player.setVelocityY(-200);
             }
 
+
+            /*
+              A AJOUTER
+              - controles au clavier ou a la manette
+              - indicateurs de vie + invulnerabilité
+              - Ennemis : fait perdre de la vie, comportement déterminé, possibilité de les faire disparaitre
+              - Deplacement en rebondissant sur les parois rocheuses
+              - altéraion du deplacement : gravité alterée
+              - obstacles causant la fin du jeu (mort du personnage)
+              - Power-up debloquant une capacité (eclairs -> charges electriques a depenser)
+              - scrolling vertical et horizontal, parallaxe
+            */
         }
         
         function update() {
