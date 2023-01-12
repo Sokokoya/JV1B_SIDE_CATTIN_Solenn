@@ -23,7 +23,7 @@
 
         new Phaser.Game(config);
 
-        function preload(){
+        function preload() {
             this.load.image('background', 'assets/background.png');
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
@@ -32,7 +32,11 @@
             this.load.spritesheet('perso', 'assets/perso.png', {frameWidth: 32, frameHeight: 64});
         }
 
-        function create(){
+        var platforms;
+        var player;
+
+
+        function create() {
             this.add.image(1600, 1600, 'backgroundImg');
 
             const gameMap = this.add.tilemap("map");
@@ -63,6 +67,11 @@
             spikesLayer.setCollisionByProperty({estSolide: true}); 
 
             // TODO : CREER VARIABLES PLAYER ET PLATEFORMES
+            // TODO : changer les parametres de this.physics.add.sprite()
+            // Ajout du personnage dans le jeu
+            player = this.physics.add.sprite(100, 450, 'perso');
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
 
             // Ajout des collisions entre le joueur et les plateformes/pointes
             // TODO : a voir les variables sont bizarres
@@ -83,7 +92,9 @@
 
         }
         
-        function update(){}
+        function update() {
+
+        }
         
     </script>
 </body>
