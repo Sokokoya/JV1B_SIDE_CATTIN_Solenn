@@ -22,7 +22,12 @@
         var config = {
             type: Phaser.AUTO,
             width: 1600, height: 1600,
-            scene: {preload: preload, create: create, update: update }
+            scene: {preload: preload, create: create, update: update},
+
+            // active la possibilité de jouer a la manette
+            input: {gamepad: true}
+
+            
         };
 
         new Phaser.Game(config);
@@ -32,7 +37,7 @@
         // ---------------------------------- FONCTION PRELOAD -------------------------------------
         // -----------------------------------------------------------------------------------------
         function preload() {
-            this.load.image('background', 'assets/background.png');
+            this.load.image('backgroundImg', 'assets/background.png');
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
@@ -45,7 +50,7 @@
         // -----------------------------------------------------------------------------------------
         // ------------------------------ DECLARATION DES VARIABLES --------------------------------
         // -----------------------------------------------------------------------------------------
-        var platforms;
+        var platformes;
         var player;
 
 
@@ -54,30 +59,36 @@
         // ----------------------------------- FONCTION CREATE -------------------------------------
         // -----------------------------------------------------------------------------------------
         function create() {
-            this.add.image(1600, 1600, 'backgroundImg');
+            this.add.image(800, 800, 'backgroundImg');
 
             const gameMap = this.add.tilemap("map");
 
             const gameTileset = gameMap.addTilesetImage(
-                "Tileset_01",
+                "tileset.tsx",
                 "tileset"
             ); 
             
+            /*
             // Chargement des calques
             const backgroundLayer = gameMap.createLayer(
                 "background",
                 tileset // TODO: a voir si ca marche ici vu que le background est pas en tileset
-            );
+            );*/
             
             const spikesLayer = gameMap.createLayer(
                 "pointes",
-                tileset
+                gameTileset
             );
             
             const platformLayer = gameMap.createLayer(
                 "plateformes",
-                tileset
+                gameTileset
             );
+
+            const objetLayer = gameMap.createLayer(
+                "objets",
+                gameTileset
+            )
                 
             // Ajout des collisions, utilisation de la propriété estSolide
             // TODO : sur Tiled, ajouter une propriété faitMal sur les pointes
@@ -128,7 +139,11 @@
         // ----------------------------------- FONCTION UPDATE -------------------------------------
         // -----------------------------------------------------------------------------------------
         function update() {
-
+            
+            this.input.gamepad.once('connected', function (pad) {
+                // 'pad' is a reference to the gamepad that was just connected
+            });
+            
         }
         
     </script>

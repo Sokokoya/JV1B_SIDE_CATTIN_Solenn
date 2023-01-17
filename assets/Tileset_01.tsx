@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.9" tiledversion="1.9.2" name="tileset_02" tilewidth="32" tileheight="32" tilecount="180" columns="12">
- <image source="Tileset_CATTIN_Solenn_JV1B.png" width="384" height="480"/>
+ <properties>
+  <property name="estSolide" type="bool" value="false"/>
+ </properties>
+ <image source="tileset.png" width="384" height="480"/>
  <tile id="0">
   <properties>
    <property name="estSolide" type="bool" value="true"/>
@@ -28,6 +31,7 @@
  </tile>
  <tile id="5">
   <properties>
+   <property name="coeur" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="false"/>
   </properties>
  </tile>
@@ -38,21 +42,25 @@
  </tile>
  <tile id="7">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="8">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="9">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="10">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -98,21 +106,25 @@
  </tile>
  <tile id="19">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="20">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="21">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="22">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -158,21 +170,25 @@
  </tile>
  <tile id="31">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="32">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="33">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="34">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -218,21 +234,25 @@
  </tile>
  <tile id="43">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="44">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="45">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="46">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -328,6 +348,7 @@
  </tile>
  <tile id="65">
   <properties>
+   <property name="coeur" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="false"/>
   </properties>
  </tile>
@@ -338,21 +359,25 @@
  </tile>
  <tile id="67">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="68">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="69">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="70">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -398,21 +423,25 @@
  </tile>
  <tile id="79">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="80">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="81">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="82">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -458,21 +487,25 @@
  </tile>
  <tile id="91">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="92">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="93">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="94">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -498,6 +531,7 @@
  </tile>
  <tile id="99">
   <properties>
+   <property name="estPointu" type="bool" value="false"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -518,21 +552,25 @@
  </tile>
  <tile id="103">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="104">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="105">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="106">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -628,6 +666,7 @@
  </tile>
  <tile id="125">
   <properties>
+   <property name="eclair" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="false"/>
   </properties>
  </tile>
@@ -638,21 +677,25 @@
  </tile>
  <tile id="127">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="128">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="129">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="130">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -698,21 +741,25 @@
  </tile>
  <tile id="139">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="140">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="141">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="142">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -758,21 +805,25 @@
  </tile>
  <tile id="151">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="152">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="153">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="154">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
@@ -818,21 +869,25 @@
  </tile>
  <tile id="163">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="164">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="165">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="166">
   <properties>
+   <property name="estPointu" type="bool" value="true"/>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
  </tile>
