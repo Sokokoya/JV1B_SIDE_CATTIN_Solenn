@@ -22,6 +22,13 @@
         var config = {
             type: Phaser.AUTO,
             width: 1600, height: 1600,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 300 },
+                    debug: true
+                }
+            },
             scene: {preload: preload, create: create, update: update},
 
             // active la possibilité de jouer a la manette
@@ -41,7 +48,6 @@
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
-            // TODO: changer le sprite du personnage avec le nouveau
             this.load.spritesheet('perso', 'assets/sprite.png', {frameWidth: 32, frameHeight: 64});
         }
 
@@ -51,7 +57,7 @@
         // ------------------------------ DECLARATION DES VARIABLES --------------------------------
         // -----------------------------------------------------------------------------------------
         var platformes;
-        //var player;
+        var player;
 
 
 
@@ -59,7 +65,6 @@
         // ----------------------------------- FONCTION CREATE -------------------------------------
         // -----------------------------------------------------------------------------------------
         function create() {
-            var player;
 
             // ----- AFFICHAGE DU JEU -----
 
@@ -96,7 +101,7 @@
             // ----- AFFICHAGE ET PROPRIETES DU PERSONNAGE -----
             // TODO : changer les parametres de this.physics.add.sprite()
             // Ajout du personnage dans le jeu
-            player = this.physics.add.sprite(800, 800, 'perso');
+            player = this.physics.add.sprite(1584, 1056, 'perso');
             player.setBounce(0.2);
             player.setCollideWorldBounds(true);
 
@@ -109,7 +114,7 @@
             this.cameras.main.setBounds(0, 0, 1600, 1600);
 
             // Tracking de la caméra sur le joueur
-            //this.cameras.main.startFollow(player); 
+            this.cameras.main.startFollow(player); 
 
 
             // Ajout des sauts
