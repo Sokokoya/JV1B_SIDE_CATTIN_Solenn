@@ -66,6 +66,7 @@
         // -----------------------------------------------------------------------------------------
         function create() {
 
+
             // ----- AFFICHAGE DU JEU -----
 
             // Ajout de l'image de background
@@ -94,6 +95,10 @@
                 gameTileset
             )
                 
+            // Prise en charge des touches directionelles du clavier
+            cursors = this.input.keyboard.createCursorKeys();
+
+
             // Ajout des collisions, utilisation de la propriété estSolide
             platformLayer.setCollisionByProperty({estSolide: true}); 
             spikesLayer.setCollisionByProperty({estSolide: true}); 
@@ -110,7 +115,7 @@
             this.physics.add.collider(player, platformLayer); 
             this.physics.add.collider(player, spikesLayer); 
 
-            // Redimensiosn du jeu selon le fichier Tiled
+            // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
             this.cameras.main.setBounds(0, 0, 1600, 1600);
 
@@ -118,11 +123,8 @@
             this.cameras.main.startFollow(player); 
             this.cameras.main.zoom = 2;
 
+            
 
-            // Ajout des sauts
-            if (clavier.up.isDown && player.body.blocked.down) {
-                player.setVelocityY(-200);
-            }
 
 
             /*
@@ -152,17 +154,17 @@
 
             if (cursors.left.isDown) {
                 player.setVelocityX(-160);
-                player.anims.play('left', true);
+                //player.anims.play('left', true);
             } else if (cursors.right.isDown) {
                 player.setVelocityX(160);
-                player.anims.play('right', true);
+                //player.anims.play('right', true);
             } else {
                 player.setVelocityX(0);
             }
 
             // ne fonctionne que si le joueur est sur une plateforme
-            if (clavier.up.isDown && player.body.blocked.down) {
-                player.setVelocityY(-200);
+            if (cursors.up.isDown && player.body.blocked.down) {
+                player.setVelocityY(-330);
             }
             
         }
