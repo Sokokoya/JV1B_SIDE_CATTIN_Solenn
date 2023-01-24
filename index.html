@@ -121,7 +121,7 @@
 
             // Tracking de la caméra sur le joueur
             this.cameras.main.startFollow(player); 
-            this.cameras.main.zoom = 2;
+            //this.cameras.main.zoom = 2;
 
             
 
@@ -164,7 +164,7 @@
 
             // ne fonctionne que si le joueur est sur une plateforme
             if (cursors.up.isDown && player.body.blocked.down) {
-                player.setVelocityY(-330);
+                player.setVelocityY(-270);
             }
             
         }
