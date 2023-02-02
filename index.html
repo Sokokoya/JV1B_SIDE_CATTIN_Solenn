@@ -26,7 +26,7 @@
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 300 },
-                    debug: true
+                    debug: false
                 }
             },
             scene: {preload: preload, create: create, update: update},
@@ -48,7 +48,6 @@
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
-            // TODO : sprite a resize
             this.load.spritesheet('perso', 'assets/sprite.png', {frameWidth: 32, frameHeight: 64});
         }
 
@@ -58,11 +57,8 @@
         // ------------------------ DECLARATION DES VARIABLES ET FPNCTIONS--------------------------
         // -----------------------------------------------------------------------------------------
         var platformes;
-        //var player;
 
-        var deplacementX = 160;
-        var deplacementY = 210;
-
+        // Variables permettant d'effectuer un saut mural
         var sautMural = true;
         var toucheBloquee = false;
 
@@ -122,14 +118,15 @@
             platformLayer.setCollisionByProperty({estSolide: true}); 
             spikesLayer.setCollisionByProperty({estSolide: true}); 
 
+
+
             // ----- AFFICHAGE ET PROPRIETES DU PERSONNAGE -----
-            // TODO : changer les parametres de this.physics.add.sprite()
+
             // Ajout du personnage dans le jeu
             this.player = this.physics.add.sprite(1584, 1024, 'perso');
             this.player.setCollideWorldBounds(true);
 
             // Ajout des collisions entre le joueur et les plateformes/pointes
-            // TODO : a voir les variables sont bizarres
             this.physics.add.collider(this.player, platformLayer); 
             this.physics.add.collider(this.player, spikesLayer); 
 
@@ -139,7 +136,7 @@
 
             // Tracking de la caméra sur le joueur
             this.cameras.main.startFollow(this.player); 
-            this.cameras.main.zoom = 2,1;
+            this.cameras.main.zoom = 2;
 
             
 
@@ -150,11 +147,11 @@
               - controles au clavier ou a la manette
               - indicateurs de vie + invulnerabilité
               - Ennemis : fait perdre de la vie, comportement déterminé, possibilité de les faire disparaitre
-              - Deplacement en rebondissant sur les parois rocheuses
+              /- Deplacement en rebondissant sur les parois rocheuses
               - altéraion du deplacement : gravité alterée
               - obstacles causant la fin du jeu (mort du personnage)
               - Power-up debloquant une capacité (eclairs -> charges electriques a depenser)
-              - scrolling vertical et horizontal, parallaxe
+              /- scrolling vertical et horizontal, parallaxe
             */
         }
         
@@ -164,7 +161,7 @@
         // ----------------------------------- FONCTION UPDATE -------------------------------------
         // -----------------------------------------------------------------------------------------
         function update() {
-            /*
+            /* GAMEPAD
             this.input.gamepad.once('connected', function (pad) {
                 // 'pad' is a reference to the gamepad that was just connected
             });*/
@@ -202,8 +199,6 @@
 
                     this.player.setVelocityY(-270);
                     this.player.setVelocityX(-160);
-
-                    //setTimeout(cdDJ, 500);
                 }
             }
 
@@ -221,8 +216,6 @@
 
                     this.player.setVelocityY(-270);
                     this.player.setVelocityX(160);
-
-                    //setTimeout(cdDJ, 500);
                 }
             }
         }
