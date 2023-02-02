@@ -22,7 +22,19 @@
         var config = {
             type: Phaser.AUTO,
             width: 1600, height: 1600,
-            scene: {preload: preload, create: create, update: update }
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 300 },
+                    debug: true
+                }
+            },
+            scene: {preload: preload, create: create, update: update},
+
+            // active la possibilité de jouer a la manette
+            input: {gamepad: true}
+
+            
         };
 
         new Phaser.Game(config);
@@ -32,12 +44,11 @@
         // ---------------------------------- FONCTION PRELOAD -------------------------------------
         // -----------------------------------------------------------------------------------------
         function preload() {
-            this.load.image('background', 'assets/background.png');
+            this.load.image('backgroundImg', 'assets/background.png');
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
-            // TODO: changer le sprite du personnage avec le nouveau
-            this.load.spritesheet('perso', 'assets/perso.png', {frameWidth: 32, frameHeight: 64});
+            this.load.spritesheet('perso', 'assets/sprite.png', {frameWidth: 32, frameHeight: 64});
         }
 
 
@@ -45,7 +56,7 @@
         // -----------------------------------------------------------------------------------------
         // ------------------------------ DECLARATION DES VARIABLES --------------------------------
         // -----------------------------------------------------------------------------------------
-        var platforms;
+        var platformes;
         var player;
 
 
@@ -54,59 +65,66 @@
         // ----------------------------------- FONCTION CREATE -------------------------------------
         // -----------------------------------------------------------------------------------------
         function create() {
-            this.add.image(1600, 1600, 'backgroundImg');
 
+
+            // ----- AFFICHAGE DU JEU -----
+
+            // Ajout de l'image de background
+            this.add.image(800, 800, 'backgroundImg');
+
+            // Chargement des calques
             const gameMap = this.add.tilemap("map");
 
             const gameTileset = gameMap.addTilesetImage(
-                "Tileset_01",
+                "tileset",
                 "tileset"
             ); 
             
-            // Chargement des calques
-           /* const backgroundLayer = gameMap.createLayer(
-                "background",
-                tileset // TODO: a voir si ca marche ici vu que le background est pas en tileset
-            );*/
-            
             const spikesLayer = gameMap.createLayer(
                 "pointes",
-                tileset
+                gameTileset
             );
             
             const platformLayer = gameMap.createLayer(
                 "plateformes",
-                tileset
+                gameTileset
             );
+
+            const objetLayer = gameMap.createLayer(
+                "objets",
+                gameTileset
+            )
                 
+            // Prise en charge des touches directionelles du clavier
+            cursors = this.input.keyboard.createCursorKeys();
+
+
             // Ajout des collisions, utilisation de la propriété estSolide
-            // TODO : sur Tiled, ajouter une propriété faitMal sur les pointes
             platformLayer.setCollisionByProperty({estSolide: true}); 
             spikesLayer.setCollisionByProperty({estSolide: true}); 
 
-            // TODO : CREER VARIABLES PLAYER ET PLATEFORMES
+            // ----- AFFICHAGE ET PROPRIETES DU PERSONNAGE -----
             // TODO : changer les parametres de this.physics.add.sprite()
             // Ajout du personnage dans le jeu
-            player = this.physics.add.sprite(100, 450, 'perso');
+            player = this.physics.add.sprite(1584, 1024, 'perso');
             player.setBounce(0.2);
             player.setCollideWorldBounds(true);
 
             // Ajout des collisions entre le joueur et les plateformes/pointes
             // TODO : a voir les variables sont bizarres
-            this.physics.add.collider(player, plateformes); 
+            this.physics.add.collider(player, platformLayer); 
+            this.physics.add.collider(player, spikesLayer); 
 
-            // Redimensiosn du jeu selon le fichier Tiled
+            // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
             this.cameras.main.setBounds(0, 0, 1600, 1600);
 
             // Tracking de la caméra sur le joueur
             this.cameras.main.startFollow(player); 
+            //this.cameras.main.zoom = 2;
 
+            
 
-            // Ajout des sauts
-            if (clavier.up.isDown && player.body.blocked.down) {
-                player.setVelocityY(-200);
-            }
 
 
             /*
@@ -128,7 +146,27 @@
         // ----------------------------------- FONCTION UPDATE -------------------------------------
         // -----------------------------------------------------------------------------------------
         function update() {
+            /*
+            this.input.gamepad.once('connected', function (pad) {
+                // 'pad' is a reference to the gamepad that was just connected
+            });*/
 
+
+            if (cursors.left.isDown) {
+                player.setVelocityX(-160);
+                //player.anims.play('left', true);
+            } else if (cursors.right.isDown) {
+                player.setVelocityX(160);
+                //player.anims.play('right', true);
+            } else {
+                player.setVelocityX(0);
+            }
+
+            // ne fonctionne que si le joueur est sur une plateforme
+            if (cursors.up.isDown && player.body.blocked.down) {
+                player.setVelocityY(-270);
+            }
+            
         }
         
     </script>
