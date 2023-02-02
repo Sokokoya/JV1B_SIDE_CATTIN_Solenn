@@ -48,16 +48,32 @@
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
+            // TODO : sprite a resize
             this.load.spritesheet('perso', 'assets/sprite.png', {frameWidth: 32, frameHeight: 64});
         }
 
 
 
         // -----------------------------------------------------------------------------------------
-        // ------------------------------ DECLARATION DES VARIABLES --------------------------------
+        // ------------------------ DECLARATION DES VARIABLES ET FPNCTIONS--------------------------
         // -----------------------------------------------------------------------------------------
         var platformes;
-        var player;
+        //var player;
+
+        var deplacementX = 160;
+        var deplacementY = 210;
+
+        var sautMural = true;
+        var toucheBloquee = false;
+
+
+        function bloqueTouche() {
+            toucheBloquee = true;
+        }
+
+        function timerSautMural() {
+            sautMural = true;
+        }
 
 
 
@@ -95,6 +111,9 @@
                 gameTileset
             )
                 
+
+            // ----- PROPRIETES DU JEU -----
+
             // Prise en charge des touches directionelles du clavier
             cursors = this.input.keyboard.createCursorKeys();
 
@@ -106,22 +125,21 @@
             // ----- AFFICHAGE ET PROPRIETES DU PERSONNAGE -----
             // TODO : changer les parametres de this.physics.add.sprite()
             // Ajout du personnage dans le jeu
-            player = this.physics.add.sprite(1584, 1024, 'perso');
-            player.setBounce(0.2);
-            player.setCollideWorldBounds(true);
+            this.player = this.physics.add.sprite(1584, 1024, 'perso');
+            this.player.setCollideWorldBounds(true);
 
             // Ajout des collisions entre le joueur et les plateformes/pointes
             // TODO : a voir les variables sont bizarres
-            this.physics.add.collider(player, platformLayer); 
-            this.physics.add.collider(player, spikesLayer); 
+            this.physics.add.collider(this.player, platformLayer); 
+            this.physics.add.collider(this.player, spikesLayer); 
 
             // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
             this.cameras.main.setBounds(0, 0, 1600, 1600);
 
             // Tracking de la caméra sur le joueur
-            this.cameras.main.startFollow(player); 
-            //this.cameras.main.zoom = 2;
+            this.cameras.main.startFollow(this.player); 
+            this.cameras.main.zoom = 2,1;
 
             
 
@@ -152,21 +170,61 @@
             });*/
 
 
+            // ----- DEPLACEMENT ET SAUTS DU SPRITE -----
+            // Deplacement de gauche a droite
             if (cursors.left.isDown) {
-                player.setVelocityX(-160);
+                this.player.setVelocityX(-160);
                 //player.anims.play('left', true);
             } else if (cursors.right.isDown) {
-                player.setVelocityX(160);
+                this.player.setVelocityX(160);
                 //player.anims.play('right', true);
             } else {
-                player.setVelocityX(0);
+                this.player.setVelocityX(0);
             }
 
+            // Saut simple
             // ne fonctionne que si le joueur est sur une plateforme
-            if (cursors.up.isDown && player.body.blocked.down) {
-                player.setVelocityY(-270);
+            if (cursors.up.isDown && this.player.body.blocked.down) {
+                this.player.setVelocityY(-270);
             }
             
+
+            // Saut mural de droite a gauche || controller.up && this.player.body.blocked.right
+            // Fonctionne si le joueur est a colle a la gauche d'un mur
+            if (cursors.up.isDown && this.player.body.blocked.right) {
+                if (sautMural == true) {
+
+                    sautMural = false;
+                    toucheBloquee = false;
+
+                    setTimeout(bloqueTouche(), 200);
+                    setTimeout(timerSautMural(), 500);
+
+                    this.player.setVelocityY(-270);
+                    this.player.setVelocityX(-160);
+
+                    //setTimeout(cdDJ, 500);
+                }
+            }
+
+            // Saut mural de gauche a droite || controller.up && this.player.body.blocked.left
+            // Fonctionne si le joueur est a colle a la droite d'un mur
+            if (cursors.up.isDown && this.player.body.blocked.left ) {
+                if (sautMural == true) {
+
+                    sautMural = false;
+                    toucheBloquee = false;
+
+                    setTimeout(bloqueTouche(), 200);
+                    setTimeout(timerSautMural(), 500);
+                    
+
+                    this.player.setVelocityY(-270);
+                    this.player.setVelocityX(160);
+
+                    //setTimeout(cdDJ, 500);
+                }
+            }
         }
         
     </script>
