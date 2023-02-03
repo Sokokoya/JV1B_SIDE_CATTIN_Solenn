@@ -58,12 +58,15 @@
         // -----------------------------------------------------------------------------------------
         // ------------------------ DECLARATION DES VARIABLES ET FPNCTIONS--------------------------
         // -----------------------------------------------------------------------------------------
-        var platformes;
 
-        // Variables permettant d'effectuer un saut mural
+        var platformes;
+        var nombreCoeurs = 3;
+        var nbCoeursTexte;
+
+
+        // ----- Variables et Fonctions permettant d'effectuer un saut mural -----
         var sautMural = true;
         var toucheBloquee = false;
-
 
         function bloqueTouche() {
             toucheBloquee = true;
@@ -74,29 +77,53 @@
         }
 
 
-        // Fonction utilisée lorsque le joueur touche un pic
+        // ----- Fonction utilisée lorsque le joueur touche un pic -----
         function touchePic() {
             console.log("pics touches => mort immediate");
-                setTimeout(() => {
-                    location.reload();
-                }, 450);
-                this.physics.pause();
-                this.player.setTint(0xff0000);
-        }
-
-        // Fonction utilisée lorsque le joueur touche un ennemi
-        function toucheEnnemi(ennemi) {
-            // if le joueur n'est pas au dessus
-            console.log("ennemi touche => un coeur en moins");
+            
+            nombreCoeurs = 0;
+            setTimeout(() => {
+                location.reload();
+            }, 450);
             this.physics.pause();
-            setTimeout(this.player.setTint(0xff0000), 100);
-            // else le joueur est au dessus et fait disparaitre le sprite
-            ennemi.destroy()
+            this.player.setTint(0xff0000);
         }
 
-        function detruireSprite(sprite) {
-            sprite.destroy();
+
+        // ----- Fonction utilisée lorsque le joueur touche un ennemi -----
+        function toucheEnnemi(ennemi) {
+
+            // Si le joueur touche l'ennemi passé en parametre par un de ses cotes
+            if (this.player.blocked.right || this.player.blocked.left) {
+                console.log("ennemi touche => un coeur en moins");
+                nombreCoeurs -= 1;
+
+                // Si le nombre de coeurs du joueur est a zero, celui ci meurt
+                if (nombreCoeurs == 0) {
+                    console.log("plus de coeurs => mort immediate");
+                    setTimeout(() => {
+                        location.reload();
+                    }, 450);this.physics.pause();
+                    this.player.setTint(0xff0000);
+
+                // Sinon le joueur prend seulement ses degats et se teinte en rouge
+                } else {
+                    setTimeout(this.player.setTint(0xff0000), 200);
+                }
+               
+            // Sinon, si le joueur saute sur le sprite ennemi, il le fait disparaitre
+            } else if (this.player.blocked.down) {
+                setTimeout(ennemi.setTint(0xff0000), 200);
+                ennemi.destroy();
+            }            
         }
+
+        // ----- Fonction qui rajoute un coeur au joueur -----
+        function ajoutCoeur() {
+            nombreCoeurs += 1;
+            nbCoeursTexte.setText('Coeurs : ' + nombreCoeurs);
+        }
+
 
 
         // -----------------------------------------------------------------------------------------
@@ -133,6 +160,7 @@
                 gameTileset
             )
                 
+            nbCoeursTexte = this.add.text(16, 16, 'Coeurs : 3', { fontSize: '32px', fill: '#000' });
 
             // ----- PROPRIETES DU JEU -----
 
@@ -154,11 +182,11 @@
 
             // Ajout des collisions entre le joueur et les plateformes/pointes
             this.physics.add.collider(this.player, platformLayer); 
-            this.physics.add.collider(this.player, spikesLayer); 
+            this.physics.add.collider(this.player, spikesLayer, touchePic, null); 
             
 
             // ----- AFFICHAGE ET PROPRIETES DES ENNEMIS -----
-            this.ennemi1 = this.physics.add.sprite(1584, 1024, 'ennemi');
+            this.ennemi1 = this.physics.add.sprite(1484, 1024, 'ennemi');
             this.ennemi1.setCollideWorldBounds(true);
             this.physics.add.collider(this.ennemi1, platformLayer);
 
