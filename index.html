@@ -56,7 +56,7 @@
 
 
         // -----------------------------------------------------------------------------------------
-        // ------------------------ DECLARATION DES VARIABLES ET FPNCTIONS--------------------------
+        // ------------------------ DECLARATION DES VARIABLES ET FONCTIONS--------------------------
         // -----------------------------------------------------------------------------------------
 
         var platformes;
@@ -196,7 +196,9 @@
                 gameTileset
             );
                 
+            // #TODO : changer ici pour mettre les images des coeurs en fonction du nb de coeurs restants
             nbCoeursTexte = this.add.text(16, 16, 'Coeurs : 3', { fontSize: '32px', fill: '#000' });
+
 
             // ----- PROPRIETES DU JEU -----
 
@@ -220,40 +222,31 @@
             this.physics.add.collider(this.player, platformLayer); 
             this.physics.add.collider(this.player, spikesLayer, touchePic, null, this); 
 
-            this.physics.add.overlap(this.player, coeursLayer, ajoutCoeur, null, this);
+            // #TODO : probleme ici -> la fonction ajoutCoeur se lance sans cesse + donner un max de coeurs possibles
+            this.physics.add.collider(this.player, coeursLayer, ajoutCoeur, null, this);
+
+            // #TODO : essayer avec la fonction overlap et non collider
+            this.physics.add.collider(this.player, eclairLayer, toucheEclair, null, this);
             
 
             // ----- AFFICHAGE ET PROPRIETES DES ENNEMIS -----
+            // #TODO : changer placement ennemi + le faire bouger de droite a gauche
             this.ennemi1 = this.physics.add.sprite(1484, 1024, 'ennemi');
             this.ennemi1.setCollideWorldBounds(true);
             this.physics.add.collider(this.ennemi1, platformLayer);
 
             // Ajout des collisions entre le personnage et les ennemis
-            this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi(ennemi1), null, this);
+            this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi, null, this);
 
             // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
+            // #TODO : reussir a gerer la camera sans tout faire bug
             this.cameras.main.setBounds(0, 0, 1600, 1600);
 
             // Tracking de la caméra sur le joueur
             this.cameras.main.startFollow(this.player); 
             this.cameras.main.zoom = 2;
 
-            
-
-
-
-            /*
-              A AJOUTER
-              - controles au clavier ou a la manette
-              - indicateurs de vie + invulnerabilité
-              - Ennemis : fait perdre de la vie, comportement déterminé, possibilité de les faire disparaitre
-              /- Deplacement en rebondissant sur les parois rocheuses
-              - altéraion du deplacement : gravité alterée
-              - obstacles causant la fin du jeu (mort du personnage)
-              - Power-up debloquant une capacité (eclairs -> charges electriques a depenser)
-              /- scrolling vertical et horizontal, parallaxe
-            */
         }
         
 
@@ -269,6 +262,7 @@
 
 
             // ----- DEPLACEMENT ET SAUTS DU SPRITE -----
+            // #TODO : RAJOUTER TOUS LES DEPLACEMENTS AU GAMEPAD
 
             // Deplacement de gauche a droite
             if (cursors.left.isDown) {
@@ -320,8 +314,6 @@
                 }
             }
 
-
-            // ----- PERTE DE VIE -----
 
         }
         
