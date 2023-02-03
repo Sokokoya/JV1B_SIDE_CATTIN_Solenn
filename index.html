@@ -124,6 +124,32 @@
             nbCoeursTexte.setText('Coeurs : ' + nombreCoeurs);
         }
 
+        // ----- Fonctions qui doublent la vitesse de deplacement lorsqu'un eclair est touché -----
+        function toucheEclair() {
+            setTimeout(deplacementDouble, 200);
+        }
+
+        function deplacementDouble() {
+            if (cursors.left.isDown) {
+                this.player.setVelocityX(-320);
+
+            } else if (cursors.right.isDown) {
+                this.player.setVelocityX(320);
+
+            } else {
+                this.player.setVelocityX(0);
+            }
+
+            if (cursors.up.isDown && this.player.body.blocked.down) {
+                this.player.setVelocityY(-540);
+            }
+        }
+
+        // ----- Fonction alterant la gravité permettant au joueur de monter l'echelle -----
+        function monteEchelle() {
+            setTimeout(this.player.setVelocityY(-3000), 200);
+        }
+
 
 
         // -----------------------------------------------------------------------------------------
@@ -155,10 +181,20 @@
                 gameTileset
             );
 
-            const objetLayer = gameMap.createLayer(
-                "objets",
+            const echelleLayer = gameMap.createLayer(
+                "echelle",
                 gameTileset
-            )
+            );
+
+            const coeursLayer = gameMap.createLayer(
+                "coeurs",
+                gameTileset
+            );
+
+            const eclairLayer = gameMap.createLayer(
+                "eclairs",
+                gameTileset
+            );
                 
             nbCoeursTexte = this.add.text(16, 16, 'Coeurs : 3', { fontSize: '32px', fill: '#000' });
 
@@ -182,7 +218,9 @@
 
             // Ajout des collisions entre le joueur et les plateformes/pointes
             this.physics.add.collider(this.player, platformLayer); 
-            this.physics.add.collider(this.player, spikesLayer, touchePic, null); 
+            this.physics.add.collider(this.player, spikesLayer, touchePic, null, this); 
+
+            this.physics.add.overlap(this.player, coeursLayer, ajoutCoeur, null, this);
             
 
             // ----- AFFICHAGE ET PROPRIETES DES ENNEMIS -----
@@ -191,7 +229,7 @@
             this.physics.add.collider(this.ennemi1, platformLayer);
 
             // Ajout des collisions entre le personnage et les ennemis
-            this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi(ennemi1), null);
+            this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi(ennemi1), null, this);
 
             // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
