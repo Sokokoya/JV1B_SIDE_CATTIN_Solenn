@@ -22,7 +22,8 @@
         // -----------------------------------------------------------------------------------------
         var config = {
             type: Phaser.AUTO,
-            width: 1600, height: 1600,
+            // 800 , 500
+            width: 800, height: 500,
             physics: {
                 default: 'arcade',
                 arcade: {
@@ -49,10 +50,7 @@
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
-            this.load.spritesheet('coeurs', 
-                'assets/sprite_coeurs.png',
-                { frameWidth: 64, frameHeight: 64 }
-            );
+            this.load.spritesheet('coeurs', 'assets/sprite_coeurs.png', {frameWidth: 64, frameHeight: 64});
 
             this.load.spritesheet('perso', 'assets/sprite.png', {frameWidth: 32, frameHeight: 64});
             this.load.spritesheet('ennemi', 'assets/sprite_ennemi.png', {frameWidth: 32, frameHeight: 32});
@@ -61,15 +59,20 @@
 
 
         // -----------------------------------------------------------------------------------------
-        // ------------------------ DECLARATION DES VARIABLES ET FONCTIONS--------------------------
+        // ----------------------- DECLARATION DES VARIABLES ET FONCTIONS --------------------------
         // -----------------------------------------------------------------------------------------
 
-        var platformes;
         var nombreCoeurs = 3;
-        //var nbCoeursTexte;
+        var gameOver = false;
 
 
-        // ----- Variables et Fonctions permettant d'effectuer un saut mural -----
+        // ----- VARIABLES PERMETTANT L'UTILISATION DE LA MANETTE -----
+        var gamepadConnected = false;
+        var gamepad;
+        var gamepadButton;
+
+
+        // ----- VARIABLES ET FONCTIONS PERMETTANT D'EFFECTUER UN SAUT MURAL -----
         var sautMural = true;
         var toucheBloquee = false;
 
@@ -82,30 +85,31 @@
         }
 
 
-        // ----- Fonction utilisee pour reset le jeu lorsque le joueur meurt -----
-        function reloadJeu() {
-            location.reload();
-            nombreCoeurs = 3;
-        }
-
-        // ----- Fonction utilisée lorsque le joueur touche un pic -----
+        // ----- FONCTION UTILISEE LORSQUE LE JOUEUR TOUCHE UN PIC -----
         function touchePic() {
-            console.log("pics touches => mort immediate");
-            
-            nombreCoeurs = 0;
-            updateCoeurs();
-            setTimeout(reloadJeu, 450);
-            this.physics.pause();
-            this.player.setTint(0xff0000);
+                console.log("pics touches => mort immediate");
+                this.collisionPics.active = false;
+
+                setTimeout(() => {
+                    location.reload();
+                }, 450);
+
+                this.physics.pause();
+                this.player.setTint(0xff0000);
         }
 
 
-        // ----- Fonction utilisée lorsque le joueur touche un ennemi -----
-        // #TODO : bug
-        function toucheEnnemi(ennemi) {
+        // ----- FONCTION UTILISEE LORSQUE LE JOUEUR TOUCHE UN ENNEMI -----
+        // #TODO : corriger bug (ennemi one shot le joueur + ne tue pas l'ennemi)
+        function toucheEnnemi() {
+               
+            // Si l'ennemi a un element au dessus de lui
+            if (this.ennemi1.body.blocked.up) {
+                setTimeout(ennemi1.setTint(0xff0000), 200);
+                ennemi1.destroy();
 
-            // Si le joueur touche l'ennemi passé en parametre par un de ses cotes
-            if (this.player.blocked.right || this.player.blocked.left) {
+            // Sinon, c'est que le joueur le touche d'un de ses cotes
+            } else {
                 console.log("ennemi touche => un coeur en moins");
                 nombreCoeurs -= 1;
                 updateCoeurs();
@@ -113,24 +117,25 @@
                 // Si le nombre de coeurs du joueur est a zero, celui ci meurt
                 if (nombreCoeurs == 0) {
                     console.log("plus de coeurs => mort immediate");
-                    setTimeout(reloadJeu, 450);
+                    this.collisionEnnemi.active = false;
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 450);
+
                     this.physics.pause();
                     this.player.setTint(0xff0000);
+                    gameOver = true;
 
                 // Sinon le joueur prend seulement ses degats et se teinte en rouge
                 } else {
                     setTimeout(this.player.setTint(0xff0000), 200);
                 }
-               
-            // Sinon, si le joueur saute sur le sprite ennemi, il le fait disparaitre
-            } else if (this.player.blocked.down) {
-                setTimeout(ennemi.setTint(0xff0000), 200);
-                ennemi.destroy();
-            }            
+            }    
         }
 
 
-        // ----- Fonction qui rajoute un coeur au joueur -----
+        // ----- FONCTION RAJOUTANT UN COEUR AU JOUEUR -----
         function ajoutCoeur() {
             nombreCoeurs += 1;
 
@@ -138,7 +143,7 @@
         }
 
 
-        // ----- Fonction changeant l'image du sprite coeur en fonction du nb de vie qu'il reste au joueur -----
+        // ----- FONCTION UPDATE DE L'IMAGE DU NB DE COEURS RESTANT -----
         function updateCoeurs() {
 
             if (nombreCoeurs >= 3) {
@@ -153,28 +158,29 @@
             }
         }
 
-        // ----- Fonctions qui doublent la vitesse de deplacement lorsqu'un eclair est touché -----
+        // ----- FONCTION AUGMENTANT LA VITESSE DE DEPLACEMENT LORSQU'UN ECLAIR EST TOUCHE -----
         function toucheEclair() {
-            setTimeout(deplacementDouble, 200);
+            setTimeout(deplacementDouble, 400);
         }
 
         function deplacementDouble() {
             if (cursors.left.isDown) {
-                this.player.setVelocityX(-320);
+                this.player.setVelocityX(-640);
 
             } else if (cursors.right.isDown) {
-                this.player.setVelocityX(320);
+                this.player.setVelocityX(640);
 
             } else {
                 this.player.setVelocityX(0);
             }
 
             if (cursors.up.isDown && this.player.body.blocked.down) {
-                this.player.setVelocityY(-540);
+                this.player.setVelocityY(-1080);
             }
         }
 
-        // ----- Fonction alterant la gravité permettant au joueur de monter l'echelle -----
+
+        // ----- FONCTION ALTERANT LA GRAVITE PERMETTANT DE MONTER L'ECHELLE -----
         function monteEchelle() {
             setTimeout(this.player.setVelocityY(-3000), 200);
         }
@@ -225,13 +231,12 @@
                 gameTileset
             );
                 
-            // #TODO : changer ici pour mettre les images des coeurs en fonction du nb de coeurs restants
-            //nbCoeursTexte = this.add.text(16, 16, 'Coeurs : 3', { fontSize: '32px', fill: '#000' });
-            coeurs = this.physics.add.sprite(32, 32, 'coeurs');
-            coeurs.setCollideWorldBounds(true);
-            coeurs.body.setGravity(-1);
 
-            this.physics.add.collider(coeurs, platformLayer);
+
+            // ----- AFFICHAGE DU NOMBRE DE COEURS DU JOUEUR -----
+            
+            coeurs = this.physics.add.sprite(32, 32, 'coeurs').setScrollFactor(0);
+            coeurs.body.setAllowGravity(false);
 
             this.anims.create({
                 key: 'coeur1',
@@ -258,15 +263,14 @@
             });
 
 
+
             // ----- PROPRIETES DU JEU -----
 
             // Prise en charge des touches directionelles du clavier
             cursors = this.input.keyboard.createCursorKeys();
 
-
             // Ajout des collisions, utilisation de la propriété estSolide
             platformLayer.setCollisionByProperty({estSolide: true}); 
-            spikesLayer.setCollisionByProperty({estSolide: true}); 
 
 
 
@@ -275,17 +279,16 @@
             // Ajout du personnage dans le jeu
             this.player = this.physics.add.sprite(1584, 1024, 'perso');
             this.player.setCollideWorldBounds(true);
+            
 
             // Ajout des collisions entre le joueur et les plateformes/pointes
             this.physics.add.collider(this.player, platformLayer); 
-            this.physics.add.collider(this.player, spikesLayer, touchePic, null, this); 
+            this.collisionPics = this.physics.add.collider(this.player, spikesLayer, touchePic, null, this); 
 
-            // #TODO : probleme ici -> la fonction ajoutCoeur se lance sans cesse + donner un max de coeurs possibles
             this.physics.add.collider(this.player, coeursLayer, ajoutCoeur, null, this);
-
-            // #TODO : essayer avec la fonction overlap et non collider
             this.physics.add.collider(this.player, eclairLayer, toucheEclair, null, this);
             
+
 
             // ----- AFFICHAGE ET PROPRIETES DES ENNEMIS -----
 
@@ -298,30 +301,30 @@
             tween_mouvement = this.tweens.add({
                 targets: [this.ennemi1],
                 paused: false,
-                ease: "Linear",  // vitesse du mouvement lineaire
+                ease: "Linear",  
                 duration: 2000,
                 yoyo: true, 
                 x: "+=240", 
                 delay: 0,
                 hold: 1000, 
                 repeatDelay: 1000, 
-                repeat: -1 // repetition infinie 
+                repeat: -1 
             });
 
             // Ajout des collisions entre le personnage et l'ennemi'
-            this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi);
+            this.collisionEnnemi = this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi, null, this);
+
 
 
             // ----- SETTINGS DE LA CAMERA -----
 
             // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
-            // #TODO : reussir a gerer la camera sans tout faire bug
             this.cameras.main.setBounds(0, 0, 1600, 1600);
 
             // Tracking de la caméra sur le joueur
             this.cameras.main.startFollow(this.player); 
-            //this.cameras.main.zoom = 2;
+            //this.cameras.main.zoom = 1.5;
 
         }
         
@@ -331,36 +334,44 @@
         // ----------------------------------- FONCTION UPDATE -------------------------------------
         // -----------------------------------------------------------------------------------------
         function update() {
-            // GAMEPAD
-            this.input.gamepad.once('connected', function (pad) {
-                // 'pad' is a reference to the gamepad that was just connected
+
+            // ----- INTEGRATION DU GAMEPAD -----
+            this.input.gamepad.on('connected', () => {
+                gamepad = this.input.gamepad.pad1;
+                console.log("Controller connected!");
+                
+                gamepadButton = {
+                    'left': gamepad.buttons[14],
+                    'right': gamepad.buttons[15],
+                    'jump': gamepad.buttons[0],
+                    'pause': gamepad.buttons[9]
+                };
             });
 
 
             updateCoeurs();
             // ----- DEPLACEMENT ET SAUTS DU SPRITE -----
-            // #TODO : RAJOUTER TOUS LES DEPLACEMENTS AU GAMEPAD
 
             // Deplacement de gauche a droite
-            if (cursors.left.isDown) {
+            if (cursors.left.isDown || gamepadButton?.left) {
                 this.player.setVelocityX(-160);
-                //player.anims.play('left', true);
-            } else if (cursors.right.isDown) {
+                
+            } else if (cursors.right.isDown || gamepadButton?.right) {
                 this.player.setVelocityX(160);
-                //player.anims.play('right', true);
+                
             } else {
                 this.player.setVelocityX(0);
             }
 
             // Saut simple
             // ne fonctionne que si le joueur est sur une plateforme
-            if (cursors.up.isDown && this.player.body.blocked.down) {
+            if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.down) {
                 this.player.setVelocityY(-270);
             }
             
-            // Saut mural de droite a gauche || controller.up && this.player.body.blocked.right
+            // Saut mural de droite a gauche
             // Fonctionne si le joueur est a colle a la gauche d'un mur
-            if (cursors.up.isDown && this.player.body.blocked.right) {
+            if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.right) {
                 if (sautMural == true) {
 
                     sautMural = false;
@@ -374,9 +385,9 @@
                 }
             }
 
-            // Saut mural de gauche a droite || controller.up && this.player.body.blocked.left
+            // Saut mural de gauche a droite
             // Fonctionne si le joueur est a colle a la droite d'un mur
-            if (cursors.up.isDown && this.player.body.blocked.left ) {
+            if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.left ) {
                 if (sautMural == true) {
 
                     sautMural = false;
