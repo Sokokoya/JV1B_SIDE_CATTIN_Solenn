@@ -49,6 +49,11 @@
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
+            this.load.spritesheet('coeurs', 
+                'assets/sprite_coeurs.png',
+                { frameWidth: 64, frameHeight: 64 }
+            );
+
             this.load.spritesheet('perso', 'assets/sprite.png', {frameWidth: 32, frameHeight: 64});
             this.load.spritesheet('ennemi', 'assets/sprite_ennemi.png', {frameWidth: 32, frameHeight: 32});
         }
@@ -61,7 +66,7 @@
 
         var platformes;
         var nombreCoeurs = 3;
-        var nbCoeursTexte;
+        //var nbCoeursTexte;
 
 
         // ----- Variables et Fonctions permettant d'effectuer un saut mural -----
@@ -77,33 +82,39 @@
         }
 
 
+        // ----- Fonction utilisee pour reset le jeu lorsque le joueur meurt -----
+        function reloadJeu() {
+            location.reload();
+            nombreCoeurs = 3;
+        }
+
         // ----- Fonction utilisée lorsque le joueur touche un pic -----
         function touchePic() {
             console.log("pics touches => mort immediate");
             
             nombreCoeurs = 0;
-            setTimeout(() => {
-                location.reload();
-            }, 450);
+            updateCoeurs();
+            setTimeout(reloadJeu, 450);
             this.physics.pause();
             this.player.setTint(0xff0000);
         }
 
 
         // ----- Fonction utilisée lorsque le joueur touche un ennemi -----
+        // #TODO : bug
         function toucheEnnemi(ennemi) {
 
             // Si le joueur touche l'ennemi passé en parametre par un de ses cotes
             if (this.player.blocked.right || this.player.blocked.left) {
                 console.log("ennemi touche => un coeur en moins");
                 nombreCoeurs -= 1;
+                updateCoeurs();
 
                 // Si le nombre de coeurs du joueur est a zero, celui ci meurt
                 if (nombreCoeurs == 0) {
                     console.log("plus de coeurs => mort immediate");
-                    setTimeout(() => {
-                        location.reload();
-                    }, 450);this.physics.pause();
+                    setTimeout(reloadJeu, 450);
+                    this.physics.pause();
                     this.player.setTint(0xff0000);
 
                 // Sinon le joueur prend seulement ses degats et se teinte en rouge
@@ -118,10 +129,28 @@
             }            
         }
 
+
         // ----- Fonction qui rajoute un coeur au joueur -----
         function ajoutCoeur() {
             nombreCoeurs += 1;
-            nbCoeursTexte.setText('Coeurs : ' + nombreCoeurs);
+
+            setTimeout(updateCoeurs, 100);
+        }
+
+
+        // ----- Fonction changeant l'image du sprite coeur en fonction du nb de vie qu'il reste au joueur -----
+        function updateCoeurs() {
+
+            if (nombreCoeurs >= 3) {
+                nombreCoeurs = 3;
+                coeurs.anims.play('coeur3', true);
+            } else if (nombreCoeurs == 2) {
+                coeurs.anims.play('coeur2', true);
+            } else if (nombreCoeurs == 1) {
+                coeurs.anims.play('coeur1', true);
+            } else {
+                coeurs.anims.play('coeur0', true);
+            }
         }
 
         // ----- Fonctions qui doublent la vitesse de deplacement lorsqu'un eclair est touché -----
@@ -197,7 +226,36 @@
             );
                 
             // #TODO : changer ici pour mettre les images des coeurs en fonction du nb de coeurs restants
-            nbCoeursTexte = this.add.text(16, 16, 'Coeurs : 3', { fontSize: '32px', fill: '#000' });
+            //nbCoeursTexte = this.add.text(16, 16, 'Coeurs : 3', { fontSize: '32px', fill: '#000' });
+            coeurs = this.physics.add.sprite(32, 32, 'coeurs');
+            coeurs.setCollideWorldBounds(true);
+            coeurs.body.setGravity(-1);
+
+            this.physics.add.collider(coeurs, platformLayer);
+
+            this.anims.create({
+                key: 'coeur1',
+                frames: [ { key: 'coeurs', frame: 0 } ],
+                frameRate: 20
+            });
+
+            this.anims.create({
+                key: 'coeur2',
+                frames: [ { key: 'coeurs', frame: 1 } ],
+                frameRate: 20
+            });
+
+            this.anims.create({
+                key: 'coeur3',
+                frames: [ { key: 'coeurs', frame: 2 } ],
+                frameRate: 20
+            });
+
+            this.anims.create({
+                key: 'coeur0',
+                frames: [ { key: 'coeurs', frame: 3 } ],
+                frameRate: 20
+            });
 
 
             // ----- PROPRIETES DU JEU -----
@@ -230,13 +288,31 @@
             
 
             // ----- AFFICHAGE ET PROPRIETES DES ENNEMIS -----
-            // #TODO : changer placement ennemi + le faire bouger de droite a gauche
-            this.ennemi1 = this.physics.add.sprite(1484, 1024, 'ennemi');
+
+            // Ajout du sprite ennemi et ajout des collisions avec les plateformes
+            this.ennemi1 = this.physics.add.sprite(592, 1168, 'ennemi');
             this.ennemi1.setCollideWorldBounds(true);
             this.physics.add.collider(this.ennemi1, platformLayer);
 
-            // Ajout des collisions entre le personnage et les ennemis
-            this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi, null, this);
+            // Ajout du mouvement de l'ennemi grace a un Tween
+            tween_mouvement = this.tweens.add({
+                targets: [this.ennemi1],
+                paused: false,
+                ease: "Linear",  // vitesse du mouvement lineaire
+                duration: 2000,
+                yoyo: true, 
+                x: "+=240", 
+                delay: 0,
+                hold: 1000, 
+                repeatDelay: 1000, 
+                repeat: -1 // repetition infinie 
+            });
+
+            // Ajout des collisions entre le personnage et l'ennemi'
+            this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi);
+
+
+            // ----- SETTINGS DE LA CAMERA -----
 
             // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
@@ -245,7 +321,7 @@
 
             // Tracking de la caméra sur le joueur
             this.cameras.main.startFollow(this.player); 
-            this.cameras.main.zoom = 2;
+            //this.cameras.main.zoom = 2;
 
         }
         
@@ -261,6 +337,7 @@
             });
 
 
+            updateCoeurs();
             // ----- DEPLACEMENT ET SAUTS DU SPRITE -----
             // #TODO : RAJOUTER TOUS LES DEPLACEMENTS AU GAMEPAD
 
