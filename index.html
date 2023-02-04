@@ -22,18 +22,17 @@
         // -----------------------------------------------------------------------------------------
         var config = {
             type: Phaser.AUTO,
-            // 800 , 500
             width: 800, height: 500,
             physics: {
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 300 },
-                    debug: true
+                    debug: false
                 }
             },
             scene: {preload: preload, create: create, update: update},
 
-            // active la possibilité de jouer a la manette
+            // Active la possibilité de jouer a la manette
             input: {gamepad: true}
 
             
@@ -46,12 +45,17 @@
         // ---------------------------------- FONCTION PRELOAD -------------------------------------
         // -----------------------------------------------------------------------------------------
         function preload() {
+
+            // Plateformes et background du jeu
             this.load.image('backgroundImg', 'assets/background.png');
             this.load.image('tileset', 'assets/tileset.png');
             this.load.tilemapTiledJSON("map", "assets/map.json"); 
 
+            // Interface 
+            this.load.image('ui', 'assets/interface.png');
             this.load.spritesheet('coeurs', 'assets/sprite_coeurs.png', {frameWidth: 64, frameHeight: 64});
 
+            // Heros et ennemi
             this.load.spritesheet('perso', 'assets/sprite.png', {frameWidth: 32, frameHeight: 64});
             this.load.spritesheet('ennemi', 'assets/sprite_ennemi.png', {frameWidth: 32, frameHeight: 32});
         }
@@ -87,15 +91,15 @@
 
         // ----- FONCTION UTILISEE LORSQUE LE JOUEUR TOUCHE UN PIC -----
         function touchePic() {
-                console.log("pics touches => mort immediate");
-                this.collisionPics.active = false;
+            console.log("pics touches => mort immediate");
+            this.collisionPics.active = false;
 
-                setTimeout(() => {
-                    location.reload();
-                }, 450);
+            setTimeout(() => {
+                location.reload();
+            }, 450);
 
-                this.physics.pause();
-                this.player.setTint(0xff0000);
+            this.physics.pause();
+            this.player.setTint(0xff0000);
         }
 
 
@@ -103,7 +107,7 @@
         // #TODO : corriger bug (ennemi one shot le joueur + ne tue pas l'ennemi)
         function toucheEnnemi() {
                
-            // Si l'ennemi a un element au dessus de lui
+            // Si l'ennemi a un element au dessus de lui (ici le joueur), il meurt
             if (this.ennemi1.body.blocked.up) {
                 setTimeout(ennemi1.setTint(0xff0000), 200);
                 ennemi1.destroy();
@@ -138,8 +142,7 @@
         // ----- FONCTION RAJOUTANT UN COEUR AU JOUEUR -----
         function ajoutCoeur() {
             nombreCoeurs += 1;
-
-            setTimeout(updateCoeurs, 100);
+            updateCoeurs();
         }
 
 
@@ -164,17 +167,17 @@
         }
 
         function deplacementDouble() {
-            if (cursors.left.isDown) {
+            if (cursors.left.isDown || gamepadButton?.left) {
                 this.player.setVelocityX(-640);
 
-            } else if (cursors.right.isDown) {
+            } else if (cursors.right.isDown || gamepadButton?.right) {
                 this.player.setVelocityX(640);
 
             } else {
                 this.player.setVelocityX(0);
             }
 
-            if (cursors.up.isDown && this.player.body.blocked.down) {
+            if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.down) {
                 this.player.setVelocityY(-1080);
             }
         }
@@ -230,40 +233,6 @@
                 "eclairs",
                 gameTileset
             );
-                
-
-            // ----- AFFICHAGE DE L'INTERFACE UTILISATEUR -----
-            
-
-
-            // ----- AFFICHAGE DU NOMBRE DE COEURS DU JOUEUR -----
-            
-            coeurs = this.physics.add.sprite(32, 32, 'coeurs').setScrollFactor(0);
-            coeurs.body.setAllowGravity(false);
-
-            this.anims.create({
-                key: 'coeur1',
-                frames: [ { key: 'coeurs', frame: 0 } ],
-                frameRate: 20
-            });
-
-            this.anims.create({
-                key: 'coeur2',
-                frames: [ { key: 'coeurs', frame: 1 } ],
-                frameRate: 20
-            });
-
-            this.anims.create({
-                key: 'coeur3',
-                frames: [ { key: 'coeurs', frame: 2 } ],
-                frameRate: 20
-            });
-
-            this.anims.create({
-                key: 'coeur0',
-                frames: [ { key: 'coeurs', frame: 3 } ],
-                frameRate: 20
-            });
 
 
 
@@ -280,7 +249,7 @@
             // ----- AFFICHAGE ET PROPRIETES DU PERSONNAGE -----
 
             // Ajout du personnage dans le jeu
-            this.player = this.physics.add.sprite(1584, 1024, 'perso');
+            this.player = this.physics.add.sprite(1548, 1024, 'perso');
             this.player.setCollideWorldBounds(true);
             
 
@@ -288,6 +257,8 @@
             this.physics.add.collider(this.player, platformLayer); 
             this.collisionPics = this.physics.add.collider(this.player, spikesLayer, touchePic, null, this); 
 
+            // Ajout de collider entre le joueur et les objets recuperables
+            // Declenche les fonction d'activation des objets
             this.physics.add.collider(this.player, coeursLayer, ajoutCoeur, null, this);
             this.physics.add.collider(this.player, eclairLayer, toucheEclair, null, this);
             
@@ -301,7 +272,7 @@
             this.physics.add.collider(this.ennemi1, platformLayer);
 
             // Ajout du mouvement de l'ennemi grace a un Tween
-            tween_mouvement = this.tweens.add({
+            tweenMouvement = this.tweens.add({
                 targets: [this.ennemi1],
                 paused: false,
                 ease: "Linear",  
@@ -313,25 +284,59 @@
                 repeatDelay: 1000, 
                 repeat: -1 
             });
-
-            // Ajout des collisions entre le personnage et l'ennemi'
+            
+            // Ajout des collisions entre le personnage et l'ennemi
             this.collisionEnnemi = this.physics.add.collider(this.player, this.ennemi1, toucheEnnemi, null, this);
+            
+
+            
+            // ----- AFFICHAGE DE L'INTERFACE UTILISATEUR -----
+
+            // Affichage de l'image de fond de l'UI
+            this.add.image(400, 250, 'ui').setScrollFactor(0);
+            
+            // Affichage des coeurs et creation des differentes images a afficher selon les frames de sprite
+            coeurs = this.physics.add.sprite(32, 32, 'coeurs').setScrollFactor(0);
+            coeurs.body.setAllowGravity(false);
+            
+            this.anims.create({
+                key: 'coeur1',
+                frames: [ { key: 'coeurs', frame: 0 } ],
+                frameRate: 20
+            });
+            
+            this.anims.create({
+                key: 'coeur2',
+                frames: [ { key: 'coeurs', frame: 1 } ],
+                frameRate: 20
+            });
+            
+            this.anims.create({
+                key: 'coeur3',
+                frames: [ { key: 'coeurs', frame: 2 } ],
+                frameRate: 20
+            });
+            
+            this.anims.create({
+                key: 'coeur0',
+                frames: [ { key: 'coeurs', frame: 3 } ],
+                frameRate: 20
+            });
 
 
 
             // ----- SETTINGS DE LA CAMERA -----
-
+            
             // Redimensions du jeu selon le fichier Tiled
             this.physics.world.setBounds(0, 0, 1600, 1600);
             this.cameras.main.setBounds(0, 0, 1600, 1600);
-
+            
             // Tracking de la caméra sur le joueur
-            this.cameras.main.startFollow(this.player); 
-            //this.cameras.main.zoom = 1.5;
-
+            this.cameras.main.startFollow(this.player);
+            
         }
         
-
+        
 
         // -----------------------------------------------------------------------------------------
         // ----------------------------------- FONCTION UPDATE -------------------------------------
@@ -339,6 +344,7 @@
         function update() {
 
             // ----- INTEGRATION DU GAMEPAD -----
+
             this.input.gamepad.on('connected', () => {
                 gamepad = this.input.gamepad.pad1;
                 console.log("Controller connected!");
@@ -352,7 +358,13 @@
             });
 
 
+
+            // ----- UPDATE DU NOMBRE DE COEURS ACTUELS -----
+
             updateCoeurs();
+
+
+
             // ----- DEPLACEMENT ET SAUTS DU SPRITE -----
 
             // Deplacement de gauche a droite
@@ -373,7 +385,7 @@
             }
             
             // Saut mural de droite a gauche
-            // Fonctionne si le joueur est a colle a la gauche d'un mur
+            // Fonctionne si le joueur est colle a gauche d'un mur
             if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.right) {
                 if (sautMural == true) {
 
@@ -389,7 +401,7 @@
             }
 
             // Saut mural de gauche a droite
-            // Fonctionne si le joueur est a colle a la droite d'un mur
+            // Fonctionne si le joueur est colle a droite d'un mur
             if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.left ) {
                 if (sautMural == true) {
 
