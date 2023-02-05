@@ -68,6 +68,11 @@
 
         var nombreCoeurs = 3;
         var gameOver = false;
+        var invincible = false;
+        var compteur = 300;
+
+        var speed = 160;
+        var speedUp = 270;
 
 
         // ----- VARIABLES PERMETTANT L'UTILISATION DE LA MANETTE -----
@@ -91,10 +96,15 @@
 
         // ----- FONCTION UTILISEE LORSQUE LE JOUEUR TOUCHE UN PIC -----
         function touchePic() {
-            console.log("pics touches => mort immediate");
-            this.collisionPics.active = false;
 
-            setTimeout(() => {
+            console.log("pics touches => mort immediate");
+            //this.collisionPics.active = false;
+
+            nombreCoeurs = 0;
+            updateCoeurs();
+            this.camera.main.shake(200, 0.01);
+
+            setTimeout(function() {
                 location.reload();
             }, 450);
 
@@ -104,26 +114,30 @@
 
 
         // ----- FONCTION UTILISEE LORSQUE LE JOUEUR TOUCHE UN ENNEMI -----
-        // #TODO : corriger bug (ennemi one shot le joueur + ne tue pas l'ennemi)
         function toucheEnnemi() {
                
             // Si l'ennemi a un element au dessus de lui (ici le joueur), il meurt
-            if (this.ennemi1.body.blocked.up) {
-                setTimeout(ennemi1.setTint(0xff0000), 200);
-                ennemi1.destroy();
+            if (this.ennemi1.body.touching.up) {
+                this.ennemi1.setTint(0xff0000);
+                setTimeout(this.ennemi1.destroy(), 400);
 
             // Sinon, c'est que le joueur le touche d'un de ses cotes
             } else {
                 console.log("ennemi touche => un coeur en moins");
-                nombreCoeurs -= 1;
-                updateCoeurs();
-
+                
+                if (!invincible) {
+                    invincible = true;
+                    nombreCoeurs -= 1;
+                    updateCoeurs()
+                    this.camera.main.shake(200, 0.01);
+                }
+                
                 // Si le nombre de coeurs du joueur est a zero, celui ci meurt
                 if (nombreCoeurs == 0) {
                     console.log("plus de coeurs => mort immediate");
                     this.collisionEnnemi.active = false;
 
-                    setTimeout(() => {
+                    setTimeout(function() {
                         location.reload();
                     }, 450);
 
@@ -132,15 +146,22 @@
                     gameOver = true;
 
                 // Sinon le joueur prend seulement ses degats et se teinte en rouge
-                } else {
-                    setTimeout(this.player.setTint(0xff0000), 200);
-                }
+                } /*else {
+                    this.player.setTint(0xff0000);
+                    setTimeout(this.player.clearTint(), 200);
+                }*/ 
             }    
         }
 
 
         // ----- FONCTION RAJOUTANT UN COEUR AU JOUEUR -----
-        function ajoutCoeur() {
+        function ajoutCoeur(joueur, coeur) {
+            coeur.setCollision(false);
+            coeur.alpha = 0;
+
+            this.player.setTint(0x00ff00);
+            setTimeout(this.player.clearTint(), 400);
+
             nombreCoeurs += 1;
             updateCoeurs();
         }
@@ -162,30 +183,30 @@
         }
 
         // ----- FONCTION AUGMENTANT LA VITESSE DE DEPLACEMENT LORSQU'UN ECLAIR EST TOUCHE -----
-        function toucheEclair() {
-            setTimeout(deplacementDouble, 400);
-        }
+        function toucheEclair(joueur, eclair) {
+            eclair.setCollision(false);
+            eclair.alpha = 0;
 
-        function deplacementDouble() {
-            if (cursors.left.isDown || gamepadButton?.left) {
-                this.player.setVelocityX(-640);
+            this.player.setTint(0xffff00);
+            setTimeout(this.player.clearTint(), 400);
 
-            } else if (cursors.right.isDown || gamepadButton?.right) {
-                this.player.setVelocityX(640);
+            speed = speed * 2;
+            speedUp = speedUp * 2;
 
-            } else {
-                this.player.setVelocityX(0);
-            }
-
-            if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.down) {
-                this.player.setVelocityY(-1080);
-            }
+            setTimeout(function() {
+                speed = speed / 2;
+                speedUp = speedUp / 2;
+            }, 400);
         }
 
 
         // ----- FONCTION ALTERANT LA GRAVITE PERMETTANT DE MONTER L'ECHELLE -----
         function monteEchelle() {
-            setTimeout(this.player.setVelocityY(-3000), 200);
+            speedUp = speedUp * 10;
+
+            setTimeout(function() {
+                speedUp = speedUp / 10;
+            }, 500);
         }
 
 
@@ -241,8 +262,12 @@
             // Prise en charge des touches directionelles du clavier
             cursors = this.input.keyboard.createCursorKeys();
 
-            // Ajout des collisions, utilisation de la propriété estSolide
+            // Ajout des collisions, utilisation des proprietes propres aux calques
             platformLayer.setCollisionByProperty({estSolide: true}); 
+            spikesLayer.setCollisionByProperty({estPointu: true}); 
+            coeursLayer.setCollisionByProperty({estCoeur: true}); 
+            eclairLayer.setCollisionByProperty({estEclair: true}); 
+            echelleLayer.setCollisionByProperty({estEchelle: true}); 
 
 
 
@@ -252,15 +277,15 @@
             this.player = this.physics.add.sprite(1548, 1024, 'perso');
             this.player.setCollideWorldBounds(true);
             
-
             // Ajout des collisions entre le joueur et les plateformes/pointes
             this.physics.add.collider(this.player, platformLayer); 
-            this.collisionPics = this.physics.add.collider(this.player, spikesLayer, touchePic, null, this); 
+            this.physics.add.collider(this.player, spikesLayer, touchePic, null, this); 
 
             // Ajout de collider entre le joueur et les objets recuperables
             // Declenche les fonction d'activation des objets
             this.physics.add.collider(this.player, coeursLayer, ajoutCoeur, null, this);
             this.physics.add.collider(this.player, eclairLayer, toucheEclair, null, this);
+            this.physics.add.collider(this.player, echelleLayer, monteEchelle, null, this);
             
 
 
@@ -345,7 +370,7 @@
 
             // ----- INTEGRATION DU GAMEPAD -----
 
-            this.input.gamepad.on('connected', () => {
+            this.input.gamepad.on('connected', function() {
                 gamepad = this.input.gamepad.pad1;
                 console.log("Controller connected!");
                 
@@ -365,14 +390,28 @@
 
 
 
+            // ----- SI LE JOUEUR EST SOUS L'ETAT INVINCIBLE -----
+
+            if (invincible) {
+                compteur--;
+
+                if (compteur == 0) {
+                    compteur = 200;
+                    this.player.clearTint();
+                    invincible = false;
+                }
+            }
+
+
+
             // ----- DEPLACEMENT ET SAUTS DU SPRITE -----
 
             // Deplacement de gauche a droite
             if (cursors.left.isDown || gamepadButton?.left) {
-                this.player.setVelocityX(-160);
+                this.player.setVelocityX(-speed);
                 
             } else if (cursors.right.isDown || gamepadButton?.right) {
-                this.player.setVelocityX(160);
+                this.player.setVelocityX(speed);
                 
             } else {
                 this.player.setVelocityX(0);
@@ -381,7 +420,7 @@
             // Saut simple
             // ne fonctionne que si le joueur est sur une plateforme
             if ((cursors.up.isDown || gamepadButton?.jump) && this.player.body.blocked.down) {
-                this.player.setVelocityY(-270);
+                this.player.setVelocityY(-speedUp);
             }
             
             // Saut mural de droite a gauche
@@ -395,8 +434,8 @@
                     setTimeout(bloqueTouche, 200);
                     setTimeout(timerSautMural, 500);
 
-                    this.player.setVelocityY(-270);
-                    this.player.setVelocityX(-160);
+                    this.player.setVelocityY(-speedUp);
+                    this.player.setVelocityX(-speed);
                 }
             }
 
@@ -412,8 +451,8 @@
                     setTimeout(timerSautMural, 500);
                     
 
-                    this.player.setVelocityY(-270);
-                    this.player.setVelocityX(160);
+                    this.player.setVelocityY(-speedUp);
+                    this.player.setVelocityX(speed);
                 }
             }
         }
